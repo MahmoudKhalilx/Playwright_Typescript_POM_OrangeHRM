@@ -1,7 +1,5 @@
 # Playwright TypeScript OrangeHRM
 
-This project contains UI automation tests for OrangeHRM using Playwright with TypeScript.
-
 ## Setup
 
 Install dependencies:
