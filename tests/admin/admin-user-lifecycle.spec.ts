@@ -11,7 +11,7 @@ test.describe('Admin User Lifecycle', () => {
     page,
   }, testInfo) => {
 
-    await page.waitForLoadState('networkidle');
+    // await page.waitForLoadState('networkidle');
 
     const newUserData = buildRuntimeUserData();
     console.log(`Generated user data::newusername="${newUserData.username}", password="${newUserData.password}"`);
