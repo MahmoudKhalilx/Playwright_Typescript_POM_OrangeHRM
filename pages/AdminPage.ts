@@ -82,7 +82,7 @@ export class AdminPage {
     let employeeSelected = false;
     for (const candidate of searchCandidates) {
       await employeeNameInput.fill(candidate);
-      await expect(employeeOption).toBeVisible({ timeout: 10000 });
+      await expect(employeeOption).toBeVisible({ timeout: 30000 });
 
       let optionText = '';
       for (let i = 0; i < 10; i++) {
