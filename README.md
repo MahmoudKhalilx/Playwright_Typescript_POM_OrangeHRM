@@ -15,6 +15,9 @@ Run admin lifecycle test in Chromium headed mode:
 
 ```bash
 npx playwright test tests/admin/admin-user-lifecycle.spec.ts --project=chromium --headed
+
+npx playwright test -g "login with invalid credentials" --project=chromium --headed
+
 ```
 
 ## Project Structure
