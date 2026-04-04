@@ -11,8 +11,6 @@ npx playwright install
 
 ## Run Tests
 
-Run admin lifecycle test in Chromium headed mode:
-
 ```bash
 npx playwright test tests/admin/admin-user-lifecycle.spec.ts --project=chromium --headed
 
