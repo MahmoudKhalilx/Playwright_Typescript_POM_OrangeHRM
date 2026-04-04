@@ -14,16 +14,15 @@ test.describe('Authentication', () => {
     const invalidPassword = `${credentials.password}_2`;
 
     await test.step('Open login page', async () => {
-      await loginPage.goto();
     });
 
     await test.step('Login with invalid credentials', async () => {
+      await loginPage.goto();
       await loginPage.login(credentials.username, invalidPassword);
     });
 
-    await test.step('Verify invalid credentials message is shown', async () => {
-      await expect(page.locator('.oxd-alert-content-text')).toContainText('Invalid credentials');
-      await expect(page).toHaveURL(/auth\/login/);
+    await test.step('Verify invalid credentials message is shown to be Failed', async () => {
+      await loginPage.expectInvalidCredentialsError("Invalid credentials 1");
     });
   });
 });

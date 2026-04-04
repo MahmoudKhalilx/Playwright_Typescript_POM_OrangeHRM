@@ -18,7 +18,7 @@ export default defineConfig({
   // workers: process.env.CI ? 1 : undefined,
   workers: 1,
   //change reporter from open to true to automatically open the report after the test run
-
+  
   reporter: [['list'], ['html', { open: 'always', outputFolder: `artifacts/html-report/${runId}` }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
