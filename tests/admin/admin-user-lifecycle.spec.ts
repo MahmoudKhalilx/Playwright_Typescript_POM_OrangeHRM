@@ -9,46 +9,75 @@ test.describe('Admin User Lifecycle', () => {
     adminPage,
     pimPage,
     page,
-  }, testInfo) => {
-
-    // await page.waitForLoadState('networkidle');
-
+  }) => {
     const newUserData = buildRuntimeUserData();
-    console.log(`Generated user data::newusername="${newUserData.username}", password="${newUserData.password}"`);
+    const userSummary = `username="${newUserData.username}", password="${newUserData.password}"`;
 
-    await loginPage.goto();
-    await loginPage.login(credentials.username, credentials.password);
+    let firstEmployeeFirstName = '';
+    let initialCount = 0;
+    let countAfterAdd = 0;
 
-    await dashboardPage.expectLoaded();
-    await dashboardPage.goToPim();
-    const firstEmployeeFirstName = await pimPage.getFirstEmployeeFirstName();
+    await test.step('1) Generate runtime user data', async () => {
+      console.log(`Generated user data: ${userSummary}`);
+    });
 
-    await dashboardPage.goToAdmin();
+    await test.step('2) Login with admin credentials', async () => {
+      await loginPage.goto();
+      await loginPage.login(credentials.username, credentials.password);
+      await dashboardPage.expectLoaded();
+    });
 
-    await adminPage.expectLoaded();
-    const initialCount = await adminPage.getRecordsCount();
-    console.log(`Initial user count: ${initialCount}`);
-  
-    await adminPage.clickAddUser();
-    await adminPage.fillRequiredUserData(newUserData.username, newUserData.password, firstEmployeeFirstName);
-    await adminPage.saveUser();
+    await test.step('3) Open PIM and capture first employee first name', async () => {
+      await dashboardPage.goToPim();
+      firstEmployeeFirstName = await pimPage.getFirstEmployeeFirstName();
+      console.log(`Selected employee first name: "${firstEmployeeFirstName}"`);
+    });
 
+    await test.step('4) Open Admin and capture initial record count', async () => {
+      await dashboardPage.goToAdmin();
+      await adminPage.expectLoaded();
+      initialCount = await adminPage.getRecordsCount();
+      console.log(`Initial user count: ${initialCount}`);
+    });
 
-    const countAfterAdd = await adminPage.getRecordsCount();
-    expect(countAfterAdd).toBeGreaterThan(initialCount);
-    console.log(`User count after addition: ${countAfterAdd}`);
+    await test.step(`5) Add new admin user (${newUserData.username})`, async () => {
+      await adminPage.clickAddUser();
+      await adminPage.fillRequiredUserData(
+        newUserData.username,
+        newUserData.password,
+        firstEmployeeFirstName
+      );
+      await adminPage.saveUser();
+    });
 
-    await adminPage.searchByUsername(newUserData.username);
-    const createdUserRow = page.locator('.oxd-table-card', { hasText: newUserData.username }).first();
-    await expect(createdUserRow).toBeVisible();
+    await test.step('6) Verify record count increased after add', async () => {
+      countAfterAdd = await adminPage.getRecordsCount();
+      expect(countAfterAdd).toBeGreaterThan(initialCount);
+      console.log(`User count after addition: ${countAfterAdd}`);
+    });
 
+    await test.step(`7) Search and verify created user (${newUserData.username})`, async () => {
+      await adminPage.searchByUsername(newUserData.username);
+      const createdUserRow = page
+        .locator('.oxd-table-card', { hasText: newUserData.username })
+        .first();
+      await expect(createdUserRow).toBeVisible();
+    });
 
-    await adminPage.deleteUserByUsername(newUserData.username);
-    await expect(createdUserRow).toHaveCount(0);
+    await test.step(`8) Delete created user (${newUserData.username}) and verify removal`, async () => {
+      const createdUserRow = page
+        .locator('.oxd-table-card', { hasText: newUserData.username })
+        .first();
 
-    await adminPage.resetFilters();
-    const countAfterDelete = await adminPage.getRecordsCount();
-    expect(countAfterDelete).toBeLessThan(countAfterAdd);
-    console.log(`User count after deletion: ${countAfterDelete}`);
+      await adminPage.deleteUserByUsername(newUserData.username);
+      await expect(createdUserRow).toHaveCount(0);
+    });
+
+    await test.step('9) Reset filters and verify record count decreased', async () => {
+      await adminPage.resetFilters();
+      const countAfterDelete = await adminPage.getRecordsCount();
+      expect(countAfterDelete).toBeLessThan(countAfterAdd);
+      console.log(`User count after deletion: ${countAfterDelete}`);
+    });
   });
 });
